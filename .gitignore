@@ -1,0 +1,5 @@
+# No agregar al seguimiento los ocultos de linux.
+*~
+
+# No agregar config al seguimiento por contener la pass del programador.
+config.php
