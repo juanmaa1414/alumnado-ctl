@@ -1,12 +1,13 @@
 <?php
-include 'config.php';
-include 'db_connect.php';
-
 ####
 #### Manejo de las peticiones hechas por nuestra aplicación.
 #### Podemos considerarlo como un controller (controlador) de acciones
 #### a partir de lo que consulta u opera el usuario en éste módulo.
 ####
+
+include 'config.php';
+include 'db_connect.php';
+include 'common/helpers_func.php';
 
 // --------------------------------
 
@@ -21,7 +22,7 @@ if ($_GET["action"] == "search_for_tablelist") {
 
     // Guardar en una variable.
     foreach ($formdata as $f) {
-        $form[$f] = $_GET[$f];
+        $form[$f] = $_GET[$f . '_search'];
     }
 
     // Concatenar según la consulta.
@@ -37,10 +38,25 @@ if ($_GET["action"] == "search_for_tablelist") {
         $filter .= " AND DNI LIKE '%{$form["DNI"]}%'";
     }
 
-    $sql = "SELECT * FROM profesores WHERE Id <> 0 " . $filter . " ORDER BY Id DESC"; //echo $sql;exit;
-    $query = $db->query($sql);
+    $sql = "SELECT
+                Id,
+                Apellido,
+                Nombre,
+                DNI
+            FROM profesores
+            WHERE Id <> 0 " . $filter . "
+            ORDER BY Id DESC"; //echo $sql;exit;
 
-    if ($query) {
+    $query_ok = FALSE;
+    try {
+        $query = $db->prepare($sql);
+        $query_ok = $query->execute();
+    } catch (PDOException $e) {
+        writeLogMessage($e->getMessage());
+        $err_msg = $e->getMessage();
+    }
+
+    if ($query_ok) {
         $results = $query->fetchAll(PDO::FETCH_OBJ);
         $resp = [
             "success" => TRUE,
@@ -48,6 +64,182 @@ if ($_GET["action"] == "search_for_tablelist") {
         ];
     } else {
         $resp = ["success" => FALSE];
+        if ($_app_debug_mode && isset($err_msg)) {
+            $resp["error_msg"] = $err_msg;
+        }
+    }
+
+    // Enviar la respuesta.
+    header('Content-Type: application/json');
+    echo json_encode($resp);
+}
+
+// --------------------------------
+
+if ($_GET["action"] == "create") {
+    $form = [];
+    $formdata = [
+        "Apellido",
+        "Nombre",
+        "DNI"
+    ];
+
+    // Guardar en una variable.
+    foreach ($formdata as $f) {
+        $form[$f] = $_POST[$f];
+    }
+
+    $sql = "INSERT INTO profesores (
+                Id,
+                Apellido,
+                Nombre,
+                DNI)
+            VALUES (
+                NULL,
+                '{$form["Apellido"]}',
+                '{$form["Nombre"]}',
+                '{$form["DNI"]}')";
+
+    $query_ok = FALSE;
+    try {
+        $query = $db->prepare($sql);
+        $query_ok = $query->execute();
+    } catch (PDOException $e) {
+        writeLogMessage($e->getMessage());
+        $err_msg = $e->getMessage();
+    }
+
+    if ($query_ok) {
+        $resp = [
+            "success" => TRUE
+        ];
+    } else {
+        $resp = ["success" => FALSE];
+        if ($_app_debug_mode && isset($err_msg)) {
+            $resp["error_msg"] = $err_msg;
+        }
+    }
+
+    // Enviar la respuesta.
+    header('Content-Type: application/json');
+    echo json_encode($resp);
+}
+
+// --------------------------------
+
+if ($_GET["action"] == "update") {
+    $form = [];
+    $formdata = [
+        "Id",
+        "Apellido",
+        "Nombre",
+        "DNI"
+    ];
+
+    // Guardar en una variable.
+    foreach ($formdata as $f) {
+        $form[$f] = $_POST[$f];
+    }
+
+    $sql = "UPDATE profesores
+            SET
+                Apellido = '{$form["Apellido"]}',
+                Nombre = '{$form["Nombre"]}',
+                DNI = '{$form["DNI"]}'
+            WHERE Id = {$form["Id"]}";
+
+    $query_ok = FALSE;
+    try {
+        $query = $db->prepare($sql);
+        $query_ok = $query->execute();
+    } catch (PDOException $e) {
+        writeLogMessage($e->getMessage());
+        $err_msg = $e->getMessage();
+    }
+
+    if ($query_ok) {
+        $resp = [
+            "success" => TRUE
+        ];
+    } else {
+        $resp = ["success" => FALSE];
+        if ($_app_debug_mode && isset($err_msg)) {
+            $resp["error_msg"] = $err_msg;
+        }
+    }
+
+    // Enviar la respuesta.
+    header('Content-Type: application/json');
+    echo json_encode($resp);
+}
+
+// --------------------------------
+
+if ($_GET["action"] == "delete") {
+    // Solo obtenemos el id de la solicitud.
+    $Id = $_POST["Id"];
+
+    $sql = "DELETE FROM profesores WHERE Id = {$Id}";
+
+    $query_ok = FALSE;
+    try {
+        $query = $db->prepare($sql);
+        $query_ok = $query->execute();
+    } catch (PDOException $e) {
+        writeLogMessage($e->getMessage());
+        $err_msg = $e->getMessage();
+    }
+
+    if ($query_ok) {
+        $resp = [
+            "success" => TRUE
+        ];
+    } else {
+        $resp = ["success" => FALSE];
+        if ($_app_debug_mode && isset($err_msg)) {
+            $resp["error_msg"] = $err_msg;
+        }
+    }
+
+    // Enviar la respuesta.
+    header('Content-Type: application/json');
+    echo json_encode($resp);
+}
+
+// --------------------------------
+
+if ($_GET["action"] == "fetch_single") {
+    // Solo obtenemos el id de la solicitud.
+    $Id = $_GET["Id"];
+
+    $sql = "SELECT
+                Id,
+                Apellido,
+                Nombre,
+                DNI
+            FROM profesores
+            WHERE Id = {$Id}";
+
+    $query_ok = FALSE;
+    try {
+        $query = $db->prepare($sql);
+        $query_ok = $query->execute();
+    } catch (PDOException $e) {
+        writeLogMessage($e->getMessage());
+        $err_msg = $e->getMessage();
+    }
+
+    if ($query_ok) {
+        $result = $query->fetchObject();
+        $resp = [
+            "success" => TRUE,
+            "result" => $result
+        ];
+    } else {
+        $resp = ["success" => FALSE];
+        if ($_app_debug_mode && isset($err_msg)) {
+            $resp["error_msg"] = $err_msg;
+        }
     }
 
     // Enviar la respuesta.
