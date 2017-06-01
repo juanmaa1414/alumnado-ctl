@@ -3,3 +3,9 @@
 
 # No agregar config al seguimiento por contener la pass del programador.
 config.php
+
+# No incluir nada que este dentro de este dir.
+logs/*
+
+# (Excepto el gitkeep, que si DEBE existir).
+!logs/.gitkeep
