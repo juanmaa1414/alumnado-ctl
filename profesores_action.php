@@ -14,8 +14,8 @@ include 'common/helpers_func.php';
 if ($_GET["action"] == "search_for_tablelist") {
     $form = [];
     $formdata = [
-        "Apellido",
-        "Nombre",
+        "apellido",
+        "nombres",
         "DNI"
     ];
     $filter = "";
@@ -26,12 +26,12 @@ if ($_GET["action"] == "search_for_tablelist") {
     }
 
     // Concatenar según la consulta.
-    if ($form["Apellido"] != "") {
-        $filter .= " AND Apellido LIKE '%{$form["Apellido"]}%'";
+    if ($form["apellido"] != "") {
+        $filter .= " AND apellido LIKE '%{$form["apellido"]}%'";
     }
 
-    if ($form["Nombre"] != "") {
-        $filter .= " AND Nombre LIKE '%{$form["Nombre"]}%'";
+    if ($form["nombres"] != "") {
+        $filter .= " AND nombres LIKE '%{$form["nombres"]}%'";
     }
 
     if ($form["DNI"] != "") {
@@ -40,10 +40,10 @@ if ($_GET["action"] == "search_for_tablelist") {
 
     $sql = "SELECT
                 Id,
-                Apellido,
-                Nombre,
+                apellido,
+                nombres,
                 DNI
-            FROM profesores
+            FROM Profesores
             WHERE Id <> 0 " . $filter . "
             ORDER BY Id DESC"; //echo $sql;exit;
 
@@ -79,8 +79,8 @@ if ($_GET["action"] == "search_for_tablelist") {
 if ($_GET["action"] == "create") {
     $form = [];
     $formdata = [
-        "Apellido",
-        "Nombre",
+        "apellido",
+        "nombres",
         "DNI"
     ];
 
@@ -89,15 +89,15 @@ if ($_GET["action"] == "create") {
         $form[$f] = $_POST[$f];
     }
 
-    $sql = "INSERT INTO profesores (
+    $sql = "INSERT INTO Profesores (
                 Id,
-                Apellido,
-                Nombre,
+                apellido,
+                nombres,
                 DNI)
             VALUES (
                 NULL,
-                '{$form["Apellido"]}',
-                '{$form["Nombre"]}',
+                '{$form["apellido"]}',
+                '{$form["nombres"]}',
                 '{$form["DNI"]}')";
 
     $query_ok = FALSE;
@@ -131,8 +131,8 @@ if ($_GET["action"] == "update") {
     $form = [];
     $formdata = [
         "Id",
-        "Apellido",
-        "Nombre",
+        "apellido",
+        "nombres",
         "DNI"
     ];
 
@@ -141,10 +141,10 @@ if ($_GET["action"] == "update") {
         $form[$f] = $_POST[$f];
     }
 
-    $sql = "UPDATE profesores
+    $sql = "UPDATE Profesores
             SET
-                Apellido = '{$form["Apellido"]}',
-                Nombre = '{$form["Nombre"]}',
+                apellido = '{$form["apellido"]}',
+                nombres = '{$form["nombres"]}',
                 DNI = '{$form["DNI"]}'
             WHERE Id = {$form["Id"]}";
 
@@ -179,7 +179,7 @@ if ($_GET["action"] == "delete") {
     // Solo obtenemos el id de la solicitud.
     $Id = $_POST["Id"];
 
-    $sql = "DELETE FROM profesores WHERE Id = {$Id}";
+    $sql = "DELETE FROM Profesores WHERE Id = {$Id}";
 
     $query_ok = FALSE;
     try {
@@ -214,10 +214,10 @@ if ($_GET["action"] == "fetch_single") {
 
     $sql = "SELECT
                 Id,
-                Apellido,
-                Nombre,
+                apellido,
+                nombres,
                 DNI
-            FROM profesores
+            FROM Profesores
             WHERE Id = {$Id}";
 
     $query_ok = FALSE;

@@ -17,6 +17,13 @@
         <script src="vendor/js/bootstrap-table.min.js"></script>
         <script src="vendor/js/bootstrap-table-es-AR.min.js"></script>
 
+        <script src="vendor/js/bootstrap-table-print.js"></script>
+        <script src="vendor/js/bootstrap-table-export.js"></script>
+        <script src="vendor/js/tableExport.js"></script>
+        <script src="vendor/js/jspdf.min.js"></script>
+        <script src="vendor/js/jspdf.plugin.autotable.js"></script>
+
+
         <script src="js/general_api.js"></script>
 
         <title><?= $page_title ?></title>

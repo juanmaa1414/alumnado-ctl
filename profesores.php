@@ -22,8 +22,8 @@ include 'layout_page_top.php';
         var action_name = 'search_for_tablelist';
 
         var formdata = {
-            Apellido_search:   $("#Apellido_search").val(),
-            Nombre_search:     $("#Nombre_search").val(),
+            apellido_search:   $("#apellido_search").val(),
+            nombres_search:     $("#nombres_search").val(),
             DNI_search:        $("#DNI_search").val()
         };
 
@@ -86,8 +86,8 @@ include 'layout_page_top.php';
                         row = data.result;
 
                         // Rellenar los datos sobre el registro a editar.
-                        $("#Apellido").val(row.Apellido);
-                        $("#Nombre").val(row.Nombre);
+                        $("#apellido").val(row.apellido);
+                        $("#nombres").val(row.nombres);
                         $("#DNI").val(row.DNI);
                         $("#Id").val(row.Id);
                     } else {
@@ -112,7 +112,7 @@ include 'layout_page_top.php';
         $("#userModal").modal("show")
                         // Cuando termina de mostrarse.
                         .on("shown.bs.modal", function(e) {
-                            $("#Apellido").select(); // Selecciona todo el texto.
+                            $("#apellido").select(); // Selecciona todo el texto.
                         });
     }
 
@@ -212,18 +212,59 @@ include 'layout_page_top.php';
         });
 
     });
+
+    // Dentro de éste closure, hacemos un rewrite (sobreescritura) de algunos métodos
+    // y propiedades de ciertas librerías js para personalizarlas a nuestro uso y necesidad.
+    (function($){
+
+        // Reescribimos el método de boostr table encargado de formatear
+        // el html para la impresión de la tabla.
+        // La intención es darle el encabezado y los datos que queramos agregar.
+        $.fn.bootstrapTable.defaults.printPageBuilder = function(table) {
+            var now = new Date();
+            var curDay = now.getDate()+"/"+(now.getMonth()+1)+"/"+now.getFullYear();
+
+            // Lo que se filtró en forma de url y luego cambiamos las separaciones (&)
+            // por saltos de línea (<br>).
+            var filtered = $("#search-form").serialize().replace("&", "<br>", "g");
+
+            return '<html><head>' +
+                    '<style type="text/css" media="print">' +
+                    '  @page { size: auto;   margin: 25px 0 25px 0; }' +
+                    '</style>' +
+                    '<style type="text/css" media="all">' +
+                    'table{border-collapse: collapse; font-size: 12px; }\n' +
+                    'table, th, td {border: 1px solid grey}\n' +
+                    'th, td {text-align: center; vertical-align: middle;}\n' +
+                    'p {font-weight: bold; margin-left:20px }\n' +
+                    'table { width:94%; margin-left:3%; margin-right:3%}\n' +
+                    'div.bs-table-print { text-align:center;}\n' +
+                    '</style></head><title>Imprimir</title><body>' +
+
+                    '<div style="text-align: right;">Impreso el '+ curDay +'</div>'+
+                    '<h2>PROFESORES</h2>'+
+                        filtered +
+                        '<br><br><div class="bs-table-print">' + table + '</div>'+
+                    '</body></html>';
+        }
+
+        // Reescribimos la propiedad que indica cuales formatos de exportar usamos.
+        $.fn.bootstrapTable.defaults.exportTypes = ['pdf', 'excel'];
+    }(jQuery));
 </script>
 
 <fieldset>
     <legend>Profesores</legend>
 
     <div class="form-inline">
-        <input type="text" class="form-control" name="Apellido_search" id="Apellido_search" placeholder="Apellido" value="">
-        <input type="text" class="form-control" name="Nombre_search" id="Nombre_search" placeholder="Nombre" value="">
-        <input type="text" class="form-control" name="DNI_search" id="DNI_search" placeholder="DNI" value="">
-        <button type="button" class="btn btn-default" id="form-search-btn" onclick="searchByFormdata()">Buscar</button>
-        <button type="button" class="pull-right btn btn-primary"
-                id="form-search-btn" onclick="showEditProfModal(false, 0)">Nuevo</button>
+        <form id="search-form" action="" onsubmit="return false;">
+            <input type="text" class="form-control" name="apellido_search" id="apellido_search" placeholder="apellido" value="">
+            <input type="text" class="form-control" name="nombres_search" id="nombres_search" placeholder="nombres" value="">
+            <input type="text" class="form-control" name="DNI_search" id="DNI_search" placeholder="DNI" value="">
+            <button type="button" class="btn btn-default" id="form-search-btn" onclick="searchByFormdata()">Buscar</button>
+            <button type="button" class="pull-right btn btn-primary"
+                    id="form-search-btn" onclick="showEditProfModal(false, 0)">Nuevo</button>
+        </form>
     </div>
 </fieldset>
 <br>
@@ -232,11 +273,14 @@ include 'layout_page_top.php';
     <table id="profesores-table"
         class="table table-condensed table-hover table-bordered"
         data-toggle="table"
-        data-search="true">
+        data-search="true"
+        data-pagination="true"
+        data-show-print="true"
+        data-show-export="true">
         <thead>
             <tr>
-                <th data-field="Apellido" data-sortable="true">Apellido</th>
-                <th data-field="Nombre" data-sortable="true">Nombre</th>
+                <th data-field="apellido" data-sortable="true">Apellido</th>
+                <th data-field="nombres" data-sortable="true">Nombres</th>
                 <th data-field="DNI" data-sortable="true">DNI</th>
                 <th data-field="Id" data-formatter="opcionesFormatter">Opciones</th>
             </tr>
@@ -254,13 +298,13 @@ include 'layout_page_top.php';
 				</div>
 				<div class="modal-body">
                     <label>Apellido</label>
-					<input type="text" class="form-control" name="Apellido" id="Apellido" required>
+					<input type="text" class="form-control" name="apellido" id="apellido" required>
                     <br>
-					<label>Nombre</label>
-					<input type="text" class="form-control" name="Nombre" id="Nombre" required>
+					<label>Nombres</label>
+					<input type="text" class="form-control" name="nombres" id="nombres" required>
                     <br>
 					<label>DNI</label>
-					<input type="text" class="form-control" name="DNI" id="DNI" pattern="\d{7,8}" required>
+					<input type="text" class="form-control" name="DNI" id="DNI" pattern="\d{7,8}" required title="DNI solo válido.">
 				</div>
 				<div class="modal-footer">
 					<input type="hidden" name="Id" id="Id" value="0">
