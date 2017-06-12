@@ -247,4 +247,36 @@ if ($_GET["action"] == "fetch_single") {
     echo json_encode($resp);
 }
 
+// --------------------------------
+
+if ($_GET["action"] == "validate_dni_exists") {
+    $dni = $_GET["dni"]? : 0;
+
+    $query_ok = FALSE;
+    try {
+        $query = $db->query("SELECT COUNT(*) FROM Profesores WHERE DNI={$dni}");
+        $query_ok = ($query !== FALSE);
+    } catch (PDOException $e) {
+        writeLogMessage($e->getMessage());
+        $err_msg = $e->getMessage();
+    }
+
+    if ($query_ok) {
+        $num = $query->fetchColumn();
+        $resp = [
+            "success" => TRUE,
+            "existing" => ($num > 0)
+        ];
+    } else {
+        $resp = ["success" => FALSE];
+        if ($_app_debug_mode && isset($err_msg)) {
+            $resp["error_msg"] = $err_msg;
+        }
+    }
+
+    // Enviar la respuesta.
+    header('Content-Type: application/json');
+    echo json_encode($resp);
+}
+
 // Fin del script.

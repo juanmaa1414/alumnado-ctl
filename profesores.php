@@ -1,9 +1,9 @@
 <?php
 ###
-### Página de pantalla de bienvenida.
+### Página de pantalla de administrar profes.
 ###
 
-$page_title = 'I.S.F.D. "Prof. Agustín Gómez" - Gestión Alumnado';
+$page_title = 'Profesores - Gestión Alumnado';
 
 include 'config.php';
 include 'db_connect.php';
@@ -112,7 +112,7 @@ include 'layout_page_top.php';
         $("#userModal").modal("show")
                         // Cuando termina de mostrarse.
                         .on("shown.bs.modal", function(e) {
-                            $("#apellido").select(); // Selecciona todo el texto.
+                            $("#DNI").select(); // Selecciona todo el texto.
                         });
     }
 
@@ -175,6 +175,38 @@ include 'layout_page_top.php';
     // También se utiliza para inicializar componentes de javascript.
     $(document).ready(function() {
 
+        // Validar si DNI ya existe al rellenar formulario de alta.
+        // En éste caso, cuando el user abandona/cambia el foco del input.
+        $("#DNI").on("blur", function() {
+            if ($("#operation").val() == "create") {
+                var action_name = "validate_dni_exists";
+                var numdni = $(this).val();
+                $.get("profesores_action.php?action="+action_name, {dni: numdni}, "json")
+                    .done(function(data) {
+                        var error_msg = "";
+
+                        if (data.success) {
+                            if (data.existing) {
+                                alert("Ya existe un registro con éste DNI.");
+                                $("#DNI").val("").focus();
+                            }
+                        } else {
+                            // Si incluyera un mensaje con el detalle del error.
+                            if (typeof data.error_msg !== "undefined") {
+                                error_msg = data.error_msg;
+                            }
+
+                            alert("Problema en la validación. \n\n" + error_msg);
+                            $("#DNI").val("").focus();
+                        }
+                    })
+                    .fail(function() {
+                        alert("Problema en la validación.");
+                        $("#DNI").val("").focus();
+                    });
+            }
+        });
+
         // Al enviar el formulario de nuevo/modif.
         $("#save-modify-profesor-form").on("submit", function(event) {
 
@@ -213,44 +245,14 @@ include 'layout_page_top.php';
 
     });
 
-    // Dentro de éste closure, hacemos un rewrite (sobreescritura) de algunos métodos
-    // y propiedades de ciertas librerías js para personalizarlas a nuestro uso y necesidad.
-    (function($){
+    function obtenerDatosFiltrado() {
+        // Lo que se filtró en forma de url y luego cambiamos las separaciones (&)
+        // por saltos de línea (<br>).
+        return $("#search-form").serialize().replace("&", "<br>", "g");
+    }
 
-        // Reescribimos el método de boostr table encargado de formatear
-        // el html para la impresión de la tabla.
-        // La intención es darle el encabezado y los datos que queramos agregar.
-        $.fn.bootstrapTable.defaults.printPageBuilder = function(table) {
-            var now = new Date();
-            var curDay = now.getDate()+"/"+(now.getMonth()+1)+"/"+now.getFullYear();
-
-            // Lo que se filtró en forma de url y luego cambiamos las separaciones (&)
-            // por saltos de línea (<br>).
-            var filtered = $("#search-form").serialize().replace("&", "<br>", "g");
-
-            return '<html><head>' +
-                    '<style type="text/css" media="print">' +
-                    '  @page { size: auto;   margin: 25px 0 25px 0; }' +
-                    '</style>' +
-                    '<style type="text/css" media="all">' +
-                    'table{border-collapse: collapse; font-size: 12px; }\n' +
-                    'table, th, td {border: 1px solid grey}\n' +
-                    'th, td {text-align: center; vertical-align: middle;}\n' +
-                    'p {font-weight: bold; margin-left:20px }\n' +
-                    'table { width:94%; margin-left:3%; margin-right:3%}\n' +
-                    'div.bs-table-print { text-align:center;}\n' +
-                    '</style></head><title>Imprimir</title><body>' +
-
-                    '<div style="text-align: right;">Impreso el '+ curDay +'</div>'+
-                    '<h2>PROFESORES</h2>'+
-                        filtered +
-                        '<br><br><div class="bs-table-print">' + table + '</div>'+
-                    '</body></html>';
-        }
-
-        // Reescribimos la propiedad que indica cuales formatos de exportar usamos.
-        $.fn.bootstrapTable.defaults.exportTypes = ['pdf', 'excel'];
-    }(jQuery));
+    // Cambiamos el encabezado de la vista de impresión para ésta página.
+    setTablePrintHeading("Profesores", obtenerDatosFiltrado);
 </script>
 
 <fieldset>
@@ -263,7 +265,10 @@ include 'layout_page_top.php';
             <input type="text" class="form-control" name="DNI_search" id="DNI_search" placeholder="DNI" value="">
             <button type="button" class="btn btn-default" id="form-search-btn" onclick="searchByFormdata()">Buscar</button>
             <button type="button" class="pull-right btn btn-primary"
-                    id="form-search-btn" onclick="showEditProfModal(false, 0)">Nuevo</button>
+                    id="form-search-btn" onclick="showEditProfModal(false, 0)">
+                <i class="glyphicon glyphicon-plus"></i>
+                Nuevo
+            </button>
         </form>
     </div>
 </fieldset>
@@ -297,14 +302,14 @@ include 'layout_page_top.php';
 					<h4 id="modal-title">&nbsp;</h4>
 				</div>
 				<div class="modal-body">
+                    <label>DNI</label>
+					<input type="text" class="form-control" name="DNI" id="DNI" pattern="\d{7,8}" required title="DNI solo válido.">
+                    <br>
                     <label>Apellido</label>
 					<input type="text" class="form-control" name="apellido" id="apellido" required>
                     <br>
 					<label>Nombres</label>
 					<input type="text" class="form-control" name="nombres" id="nombres" required>
-                    <br>
-					<label>DNI</label>
-					<input type="text" class="form-control" name="DNI" id="DNI" pattern="\d{7,8}" required title="DNI solo válido.">
 				</div>
 				<div class="modal-footer">
 					<input type="hidden" name="Id" id="Id" value="0">
