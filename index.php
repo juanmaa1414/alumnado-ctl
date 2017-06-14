@@ -1,5 +1,5 @@
 <?php
 // Redirigir.
-header("Location: home.php");
+header("Location: pages/home.php");
 
 // Fin del script.

@@ -5,26 +5,26 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css">
-        <link rel="stylesheet" href="vendor/css/bootstrap-table.min.css">
+        <link rel="stylesheet" href="../vendor/bootstrap/css/bootstrap.min.css">
+        <link rel="stylesheet" href="../vendor/css/bootstrap-table.min.css">
 
-        <link rel="stylesheet" href="css/styles-general.css">
+        <link rel="stylesheet" href="../css/styles-general.css">
 
-        <script src="vendor/js/jquery-3.2.1.min.js"></script>
+        <script src="../vendor/js/jquery-3.2.1.min.js"></script>
 
-        <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+        <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
 
-        <script src="vendor/js/bootstrap-table.min.js"></script>
-        <script src="vendor/js/bootstrap-table-es-AR.min.js"></script>
+        <script src="../vendor/js/bootstrap-table.min.js"></script>
+        <script src="../vendor/js/bootstrap-table-es-AR.min.js"></script>
 
-        <script src="vendor/js/bootstrap-table-print.js"></script>
-        <script src="vendor/js/bootstrap-table-export.js"></script>
-        <script src="vendor/js/tableExport.js"></script>
-        <script src="vendor/js/jspdf.min.js"></script>
-        <script src="vendor/js/jspdf.plugin.autotable.js"></script>
+        <script src="../vendor/js/bootstrap-table-print.js"></script>
+        <script src="../vendor/js/bootstrap-table-export.js"></script>
+        <script src="../vendor/js/tableExport.js"></script>
+        <script src="../vendor/js/jspdf.min.js"></script>
+        <script src="../vendor/js/jspdf.plugin.autotable.js"></script>
 
 
-        <script src="js/general_api.js"></script>
+        <script src="../js/general_api.js"></script>
 
         <title><?= $page_title ?></title>
     </head>

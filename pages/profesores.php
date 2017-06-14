@@ -5,10 +5,10 @@
 
 $page_title = 'Profesores - Gestión Alumnado';
 
-include 'config.php';
-include 'db_connect.php';
+include '../config.php';
+include '../db_connect.php';
 
-include 'layout_page_top.php';
+include '../layout_page_top.php';
 ?>
 
 <script>
@@ -23,14 +23,14 @@ include 'layout_page_top.php';
 
         var formdata = {
             apellido_search:   $("#apellido_search").val(),
-            nombres_search:     $("#nombres_search").val(),
+            nombres_search:    $("#nombres_search").val(),
             DNI_search:        $("#DNI_search").val()
         };
 
         // Solicitud de tipo GET.
         // Tres parámetros: url, datos a enviar, y formato de datos.
         // Luego se encadenan los "setters" done y fail para manejar el resultado.
-        $.get('profesores_action.php?action=' + action_name, formdata, "json")
+        $.get('../action_profesores.php?action=' + action_name, formdata, "json")
             .done(function(data) {
                 var error_msg = "";
 
@@ -77,7 +77,7 @@ include 'layout_page_top.php';
             $("#modal-title").text("Modificar");
 
             // Solicitud de tipo GET.
-            $.get('profesores_action.php?action=' + action_name, formdata, "json")
+            $.get('../action_profesores.php?action=' + action_name, formdata, "json")
                 .done(function(data) {
                     var error_msg = "";
                     var row;
@@ -131,7 +131,7 @@ include 'layout_page_top.php';
         }
 
         // Solicitud de tipo POST.
-        $.post('profesores_action.php?action=' + action_name, formdata, "json")
+        $.post('../action_profesores.php?action=' + action_name, formdata, "json")
             .done(function(data) {
                 var error_msg = "";
 
@@ -181,7 +181,7 @@ include 'layout_page_top.php';
             if ($("#operation").val() == "create") {
                 var action_name = "validate_dni_exists";
                 var numdni = $(this).val();
-                $.get("profesores_action.php?action="+action_name, {dni: numdni}, "json")
+                $.get("../action_profesores.php?action="+action_name, {dni: numdni}, "json")
                     .done(function(data) {
                         var error_msg = "";
 
@@ -221,7 +221,7 @@ include 'layout_page_top.php';
             var formdata = $(form).serialize();
 
             // Solicitud de tipo POST.
-            $.post('profesores_action.php?action=' + action_name, formdata, "json")
+            $.post('../action_profesores.php?action=' + action_name, formdata, "json")
                 .done(function(data) {
                     var error_msg = "";
 
@@ -323,5 +323,5 @@ include 'layout_page_top.php';
 </div>
 
 <?php
-include 'layout_page_bottom.php';
+include '../layout_page_bottom.php';
 ?>
